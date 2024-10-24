@@ -29,5 +29,5 @@ Now you have created
 ./dict --help
 Usage of ./dict
   -e string
-        Input English Word or sentence
+        Input an English word or sentence
 ```
