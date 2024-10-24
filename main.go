@@ -15,7 +15,7 @@ func convertEnglishToChinese(word string) {
 
 func main() {
 	var eWord string
-	flag.StringVar(&eWord, "e", "", "Input English Word or sentence")
+	flag.StringVar(&eWord, "e", "", "Input an English word or sentence")
 
 	flag.Parse()
 	if eWord != "" {
