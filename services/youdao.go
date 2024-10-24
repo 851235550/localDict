@@ -40,6 +40,7 @@ func (y *YoudaoService) buildQueryUrl(word string) string {
 		fmt.Println(err)
 		return ""
 	}
+
 	query := u.Query()
 	query.Set("q", word)
 	query.Set("jsonversion", y.jsonversion)
@@ -52,8 +53,15 @@ func (y *YoudaoService) buildQueryUrl(word string) string {
 }
 
 type YoudaoResponse struct {
-	Input string   `json:"input"`
-	EC    YoudaoEC `json:"ec"`
+	Input string      `json:"input,omitempty"`
+	EC    YoudaoEC    `json:"ec,omitempty"`
+	Fanyi YoudaoFanyi `json:"fanyi,omitempty"`
+}
+
+type YoudaoFanyi struct {
+	Input string `json:"input,omitempty"`
+	Type  string `json:"type,omitempty"`
+	Tran  string `json:"tran,omitempty"`
 }
 
 type YoudaoEC struct {
@@ -61,31 +69,31 @@ type YoudaoEC struct {
 }
 
 type YoudaoECWord struct {
-	Usphone string           `json:"usphone"`
-	Ukphone string           `json:"ukphone"`
-	Trs     []YoudaoECWordTr `json:"trs"`
-	Wfs     []YoudaoECWordWf `json:"wfs"`
+	Usphone string           `json:"usphone,omitempty"`
+	Ukphone string           `json:"ukphone,omitempty"`
+	Trs     []YoudaoECWordTr `json:"trs,omitempty"`
+	Wfs     []YoudaoECWordWf `json:"wfs,omitempty"`
 }
 
 type YoudaoECWordTr struct {
-	Tr []YoudaoECWordTrL `json:"tr"`
+	Tr []YoudaoECWordTrL `json:"tr,omitempty"`
 }
 
 type YoudaoECWordTrL struct {
-	L YoudaoECWordTrLI `json:"l"`
+	L YoudaoECWordTrLI `json:"l,omitempty"`
 }
 
 type YoudaoECWordTrLI struct {
-	I []string `json:"i"`
+	I []string `json:"i,omitempty"`
 }
 
 type YoudaoECWordWf struct {
-	Wf YoudaoECWordWfValue `json:"wf"`
+	Wf YoudaoECWordWfValue `json:"wf,omitempty"`
 }
 
 type YoudaoECWordWfValue struct {
-	Name  string `json:"name"`
-	Value string `json:"value"`
+	Name  string `json:"name,omitempty"`
+	Value string `json:"value,omitempty"`
 }
 
 func (y *YoudaoService) E2C(word string) {
@@ -104,12 +112,14 @@ func (y *YoudaoService) E2C(word string) {
 	youdaoResp.Print()
 }
 
-func (r *YoudaoResponse) Print() {
+func (r *YoudaoResponse) PrintWord() {
 	if len(r.EC.Word) == 0 {
 		return
 	}
 	ECWord0 := r.EC.Word[0]
-	fmt.Printf("美:[%s] 英:[%s]\n", ECWord0.Usphone, ECWord0.Ukphone)
+	if len(ECWord0.Usphone) == 0 {
+		fmt.Printf("美:[%s] 英:[%s]\n", ECWord0.Usphone, ECWord0.Ukphone)
+	}
 
 	for _, tr := range ECWord0.Trs {
 		for _, l := range tr.Tr {
@@ -123,4 +133,17 @@ func (r *YoudaoResponse) Print() {
 	for _, wf := range ECWord0.Wfs {
 		fmt.Printf("%s:%s  ", wf.Wf.Name, wf.Wf.Value)
 	}
+}
+
+func (r *YoudaoResponse) PrintFanyi() {
+	if len(r.Fanyi.Input) == 0 {
+		return
+	}
+
+	fmt.Printf("%s\n", r.Fanyi.Tran)
+}
+
+func (r *YoudaoResponse) Print() {
+	r.PrintWord()
+	r.PrintFanyi()
 }
